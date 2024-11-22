@@ -1,65 +1,59 @@
-const API_BASE_URL = 'http://localhost:3000/api/tree';
+const API_BASE_URL = 'http://localhost:3000';
 
-// Función para manejar la respuesta del servidor y mostrarla gráficamente
-const displayOutput = (data) => {
-  const outputContent = document.getElementById('outputContent');
-  outputContent.textContent = JSON.stringify(data, null, 2);
+async function fetchTraversal(type) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/${type}`);
+        const traversal = await response.json();
 
-  // Llamamos a la función para visualizar el árbol
-  if (data.tree) {
-    renderTree(data.tree);
-  }
-};
+        displayTraversalResult(type, traversal);
+        visualizeTree(traversal);
+    } catch (error) {
+        console.error('Error fetching traversal:', error);
+    }
+}
 
-// Función para añadir un nodo
-document.getElementById('addNodeForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const value = document.getElementById('addValue').value;
+function displayTraversalResult(type, traversal) {
+    const resultDiv = document.getElementById('traversal-result');
+    resultDiv.innerHTML = `
+        <h3>Recorrido (${type}):</h3>
+        <p>${traversal.join(' → ')}</p>
+    `;
+}
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/add`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: Number(value) }),
+function visualizeTree(traversal) {
+    const treeContainer = document.getElementById('tree-container');
+    treeContainer.innerHTML = ''; // Limpiar el contenedor
+
+    // Construir la estructura visual del árbol
+    if (traversal.length === 0) {
+        treeContainer.innerHTML = '<p>El árbol está vacío.</p>';
+        return;
+    }
+
+    const createNode = (value) => {
+        const node = document.createElement('div');
+        node.classList.add('node');
+        node.innerHTML = `<span>${value}</span>`;
+        return node;
+    };
+
+    // Crear visualización jerárquica
+    const levels = [];
+    let level = 0;
+    let currentLevelNodes = 1;
+
+    while (traversal.length > 0) {
+        levels[level] = traversal.splice(0, currentLevelNodes);
+        currentLevelNodes *= 2; // Siguiente nivel tiene el doble de nodos
+        level++;
+    }
+
+    levels.forEach((levelNodes) => {
+        const levelDiv = document.createElement('div');
+        levelDiv.classList.add('level');
+        levelNodes.forEach((value) => {
+            levelDiv.appendChild(createNode(value));
+        });
+        treeContainer.appendChild(levelDiv);
     });
-    const result = await response.json();
-    displayOutput(result);
-  } catch (error) {
-    displayOutput({ error: 'Error al añadir nodo', details: error });
-  }
-});
-
-// Función para eliminar un nodo
-document.getElementById('deleteNodeForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const value = document.getElementById('deleteValue').value;
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/delete`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: Number(value) }),
-    });
-    const result = await response.json();
-    displayOutput(result);
-  } catch (error) {
-    displayOutput({ error: 'Error al eliminar nodo', details: error });
-  }
-});
-
-// Función para consultar el árbol en diferentes órdenes
-const fetchOrder = async (orderType) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/${orderType}`);
-    const data = await response.json();
-    displayOutput(data);
-  } catch (error) {
-    displayOutput({ error: 'Error al consultar el árbol', details: error });
-  }
-};
-
-// Función para renderizar el árbol binario
-const renderTree = (tree) => {
-  const container = document.getElementById('treeContainer');
-  container.innerHTML = `<pre>${JSON.stringify(tree, null, 2)}</pre>`;
-};
+}

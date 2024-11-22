@@ -1,46 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Árbol Binario</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Árbol Binario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #tree-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .node span {
+            display: inline-block;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            background-color: #e9f7fe;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .link {
+            width: 30px;
+            height: 2px;
+            background-color: #007bff;
+        }
+
+        .traversal-result {
+            margin-top: 20px;
+        }
+
+        .buttons {
+            margin: 20px;
+        }
+
+        .buttons button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .buttons button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <h1>Pruebas de Árbol Binario</h1>
+    <h1>Árbol Binario</h1>
+    <div class="buttons">
+        <button onclick="fetchTraversal('breadth')">Recorrido en Anchura</button>
+        <button onclick="fetchTraversal('preorder')">Recorrido Preorden</button>
+        <button onclick="fetchTraversal('inorder')">Recorrido Inorden</button>
+        <button onclick="fetchTraversal('postorder')">Recorrido Postorden</button>
+    </div>
+    <div id="tree-container"></div>
+    <div class="traversal-result" id="traversal-result"></div>
 
-  <!-- Formulario para añadir nodos -->
-  <form id="addNodeForm">
-    <h3>Añadir Nodo</h3>
-    <label for="addValue">Valor:</label>
-    <input type="number" id="addValue" required>
-    <button type="submit">Añadir</button>
-  </form>
-
-  <!-- Formulario para eliminar nodos -->
-  <form id="deleteNodeForm">
-    <h3>Eliminar Nodo</h3>
-    <label for="deleteValue">Valor:</label>
-    <input type="number" id="deleteValue" required>
-    <button type="submit">Eliminar</button>
-  </form>
-
-  <!-- Botones para consultar el árbol -->
-  <h3>Consultar Árbol</h3>
-  <button onclick="fetchOrder('inorder')">In-Order</button>
-  <button onclick="fetchOrder('preorder')">Pre-Order</button>
-  <button onclick="fetchOrder('postorder')">Post-Order</button>
-  <button onclick="fetchOrder('levelorder')">Level-Order</button>
-
-  <!-- Área de salida -->
-  <div class="output" id="output">
-    <strong>Salida:</strong>
-    <pre id="outputContent">Nada por mostrar todavía.</pre>
-  </div>
-
-  <!-- Contenedor para la visualización gráfica del árbol -->
-  <div id="treeContainer"></div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

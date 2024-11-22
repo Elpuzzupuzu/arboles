@@ -1,58 +1,60 @@
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // Importa cors
 const BinaryTree = require('./binaryTree');
 
 const app = express();
+const tree = new BinaryTree();
+
+app.use(express.json());
+app.use(cors()); // Habilita CORS para todas las rutas
+
+// Rutas
+app.post('/insert', (req, res) => {
+    const { value } = req.body;
+    tree.insert(value);
+    res.send(`Inserted value ${value}`);
+});
+
+app.get('/search/:value', (req, res) => {
+    const { value } = req.params;
+    const found = tree.search(Number(value));
+    res.send({ found });
+});
+
+app.delete('/delete/:value', (req, res) => {
+    const { value } = req.params;
+    tree.delete(Number(value));
+    res.send(`Deleted value ${value}`);
+});
+
+app.get('/breadth', (req, res) => {
+    res.send(tree.breadthFirstTraversal());
+});
+
+app.get('/preorder', (req, res) => {
+    res.send(tree.preOrderTraversal());
+});
+
+app.get('/inorder', (req, res) => {
+    res.send(tree.inOrderTraversal());
+});
+
+app.get('/postorder', (req, res) => {
+    res.send(tree.postOrderTraversal());
+});
+
+app.get('/levels', (req, res) => {
+    res.send({ levels: tree.getLevels() });
+});
+
+app.get('/level/:value', (req, res) => {
+    const { value } = req.params;
+    const level = tree.getNodeLevel(Number(value));
+    res.send({ level });
+});
+
+// Servidor
 const PORT = 3000;
-
-app.use(cors());
-app.use(express.json()); // Middleware para manejar JSON en requests
-
-const binaryTree = new BinaryTree();
-binaryTree.generateTree(); // Genera un árbol de nivel 3 al iniciar
-
-// Endpoints existentes
-app.get('/api/tree/inorder', (req, res) => {
-  res.json({ order: 'in-order', values: binaryTree.inOrder() });
-});
-
-app.get('/api/tree/preorder', (req, res) => {
-  res.json({ order: 'pre-order', values: binaryTree.preOrder() });
-});
-
-app.get('/api/tree/postorder', (req, res) => {
-  res.json({ order: 'post-order', values: binaryTree.postOrder() });
-});
-
-app.get('/api/tree/levelorder', (req, res) => {
-  res.json({ order: 'level-order', values: binaryTree.levelOrder() });
-});
-
-// Nuevo endpoint: Añadir nodo
-app.post('/api/tree/add', (req, res) => {
-  const { value } = req.body;
-
-  if (typeof value !== 'number') {
-    return res.status(400).json({ error: 'El valor debe ser un número' });
-  }
-
-  binaryTree.addNode(value);
-  res.json({ message: `Nodo con valor ${value} añadido`, tree: binaryTree.root });
-});
-
-// Nuevo endpoint: Eliminar nodo
-app.delete('/api/tree/delete', (req, res) => {
-  const { value } = req.body;
-
-  if (typeof value !== 'number') {
-    return res.status(400).json({ error: 'El valor debe ser un número' });
-  }
-
-  binaryTree.removeNode(value);
-  res.json({ message: `Nodo con valor ${value} eliminado`, tree: binaryTree.root });
-});
-
-// Inicio del servidor
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
